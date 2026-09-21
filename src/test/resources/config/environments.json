@@ -1,0 +1,14 @@
+{
+  "dev": {
+    "baseUrl": "https://jsonplaceholder.typicode.com",
+    "timeout": 5000
+  },
+  "qa": {
+    "baseUrl": "https://jsonplaceholder.typicode.com",
+    "timeout": 10000
+  },
+  "e2e": {
+    "baseUrl": "https://jsonplaceholder.typicode.com",
+    "timeout": 15000
+  }
+}
