@@ -1,0 +1,6 @@
+{
+  "id": "#uuid",
+  "email": "#regex ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+  "is_active": "#boolean",
+  "created_at": "#regex ^\\d{4}-\\d{2}-\\d{2}T.*"
+}

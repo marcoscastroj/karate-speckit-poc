@@ -1,15 +1,18 @@
 <configuration>
 
+    <!-- Pattern com mascaramento de cabeçalhos de autorização e senhas -->
+    <property name="LOG_PATTERN" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %replace(%replace(%msg){'(Authorization:\s*Bearer\s+)[^\s\r\n]+', '$1[PROTECTED]'}){'(&quot;password&quot;\s*:\s*)&quot;[^&quot;]+&quot;', '$1&quot;[PROTECTED]&quot;'}%n"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>target/karate.log</file>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
