@@ -1,18 +1,13 @@
 <!--
 # Sync Impact Report
-- **Version Change**: Unratified Template -> 1.0.0
-- **Principles Established**:
-  - Principle I: Test Independence & Parallel Safety (NON-NEGOTIABLE)
-  - Principle II: Payload Decoupling & Schema-Driven Payloads
-  - Principle III: Dynamic Data & Synthetic Generation (Datafaker)
-  - Principle IV: Zero-Secret Exposure & Environment Parity
-  - Principle V: Living Specifications & Tagging Discipline
-- **Added Sections**:
-  - Technical Constraints & Quality Standards
-  - Development Workflow & Quality Gates
-  - Governance
-- **Removed Sections**: None (initial ratification)
-- **Deferred Items / TODOs**: None
+- **Version Change**: 1.0.0 -> 1.1.0
+- **Principles Established / Modified**:
+  - Principle IV: Zero-Secret Exposure & Environment Parity (Amended to designate `http://100.75.210.114:8000` as the baseline target environment for API testing)
+- **Added Sections / Constraints**:
+  - Target Environment & Host specification under Technical Constraints designating `http://100.75.210.114:8000` as the authoritative baseline `baseUrl`
+- **Removed Sections**: None
+- **Deferred Items / TODOs**:
+  - Deferred Intent: Update `src/test/resources/config/environments.json` with `http://100.75.210.114:8000` as `baseUrl` (to be executed via `/speckit-implement` in Task T001)
 -->
 
 # Karate DSL Test Automation Architecture Constitution
@@ -32,7 +27,7 @@ All ephemeral and transient test data (names, emails, phone numbers, identifiers
 *Rationale: Dynamic data generation ensures record uniqueness, avoids database collision during parallel test runs, and enforces realistic data patterns without risking PII exposure.*
 
 ### IV. Zero-Secret Exposure & Environment Parity
-Credentials, authorization tokens, API keys, and sensitive secrets MUST NOT be hardcoded in feature files, Java code, configuration JSON, or version control. Secrets MUST be loaded from OS environment variables or CLI system properties via `credentials-reader.js` and `CredentialUtils`. Multi-environment targets (`dev`, `qa`, `e2e`) and connection timeouts MUST be declared centrally in `src/test/resources/config/environments.json` and activated via `-Dkarate.env`.
+Credentials, authorization tokens, API keys, and sensitive secrets MUST NOT be hardcoded in feature files, Java code, configuration JSON, or version control. Secrets MUST be loaded from OS environment variables or CLI system properties via `credentials-reader.js` and `CredentialUtils`. Multi-environment targets (`dev`, `qa`, `e2e`) and connection timeouts MUST be declared centrally in `src/test/resources/config/environments.json` and activated via `-Dkarate.env`. The primary baseline endpoint for testing development and integration execution MUST target `http://100.75.210.114:8000` as the standard host for the Finance Organizer API under test.
 *Rationale: Protects infrastructure credentials from accidental leakage and ensures the exact same test suites run across environments without code modifications.*
 
 ### V. Living Specifications & Tagging Discipline
@@ -41,7 +36,7 @@ Feature files MUST act as executable specifications. Scenarios and step descript
 
 ### VI. Mandatory QA Coverage Matrix & Status Code Assertions
 Every feature specification generated for an endpoint MUST explicitly provide test scenarios for:
-1. **Happy Path**: Successful creation/retrieval (200/201) asserting the complete response schema against `openapi.json`.
+1. **Happy Path**: Successful creation/retrieval (200/201/204) asserting the complete response schema against `openapi.json`.
 2. **Payload & Boundary Validations**: Negative flows (400 or 422) for missing required fields, empty strings, invalid types, and business boundary limits defined.
 3. **Authentication & Authorization**: Missing/invalid token (401) and forbidden access (403), where secured.
 4. **Resource Non-Existence**: Not found flows (404) for random or non-existent IDs.
@@ -49,6 +44,7 @@ Every feature specification generated for an endpoint MUST explicitly provide te
 
 ## Technical Constraints & Quality Standards
 
+- **Target Environment & Host**: The authoritative test execution target for the Finance Organizer API under test is `http://100.75.210.114:8000`, configured as the baseline `baseUrl` in `src/test/resources/config/environments.json`.
 - **Runtime & Language**: Java 21 LTS with Maven compiler source and target set to version 21.
 - **Framework Ecosystem**: Karate DSL (`karate-junit5` 1.5.2), Net Datafaker (2.4.2), and JUnit 5 test platform.
 - **Directory Layout**: Dedicated test architecture organized under `src/test/` (`java/features/`, `java/utils/`, `resources/config/`, `resources/data/payloads/`, `resources/utils/`). No application production code under `src/main/`.
@@ -73,4 +69,4 @@ This Constitution is the authoritative source of architectural principles, testi
   - **PATCH**: Clarifications, grammatical fixes, formatting updates, and non-semantic refinements.
 - **Compliance & Auditing**: All code reviews and automated checks MUST enforce compliance with this constitution. Any deviation or technical debt MUST be documented with an issue ticket and bounded time frame.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-21 | **Last Amended**: 2026-09-21
+**Version**: 1.1.0 | **Ratified**: 2026-09-21 | **Last Amended**: 2026-09-23
