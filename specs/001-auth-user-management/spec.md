@@ -8,6 +8,15 @@
 
 **Input**: User description: "Autenticação e Gestão de Usuário (Auth) - Matriz exaustiva de cenários de testes de API cobrindo 100% das regras de negócio, limites de schema, autenticação/autorização e integridade transacional de dados baseados em openapi.json"
 
+## Clarifications
+
+### Session 2026-09-23
+- Q: Qual código de status HTTP exato deve ser validado no cenário de teste automatizado quando houver tentativa de cadastro com e-mail já existente em POST /api/v1/auth/register? (FR-002) → A: 409 Conflict (padrão semântico REST para conflito de unicidade de dados)
+- Q: Qual código de status HTTP exato deve ser validado nas falhas de autenticação por credenciais inválidas (senha incorreta ou e-mail inexistente) em POST /api/v1/auth/login? (FR-008) → A: 401 Unauthorized (padrão REST e OAuth2 para credenciais incorretas ou usuário não encontrado)
+- Q: Qual código de status HTTP exato deve ser validado na tentativa de login de um usuário cuja conta está desativada (is_active: false) em POST /api/v1/auth/login? (FR-009) → A: 403 Forbidden (credenciais reconhecidas, mas operação negada pelo status desativado)
+- Q: Como o teste automatizado em Karate deve validar a tentativa de injeção de campos extras não mapeados no payload de POST /api/v1/auth/register? (FR-006) → A: 422 Unprocessable Entity (validação estrita com rejeição explícita de campos não mapeados)
+- Q: Como os testes em Karate DSL devem validar a integridade da exclusão em cascata das entidades filhas (accounts, transactions, investments) após DELETE /api/v1/auth/me? (SCEN-DEL-02) → A: Caixa-preta via HTTP API (valida 204, ausência de erro 500 de integridade referencial, revogação 401 e inacessibilidade 404 dos IDs órfãos sem requerer JDBC)
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Cadastro e Validação de Contas de Usuário (Priority: P1)
@@ -105,7 +114,7 @@ Scenario: SCEN-REG-04 - Conflito cadastral para e-mail já existente
     }
     """
   When o cliente envia uma requisição POST para "/api/v1/auth/register"
-  Then o código de status HTTP retornado deve ser 422 ou 409
+  Then o código de status HTTP retornado deve ser 409
   And o corpo da resposta deve indicar erro de violação de unicidade ou conflito cadastral
   And como pós-condição, o registro original permanece inalterado e nenhum novo registro é adicionado
 ```
@@ -184,7 +193,7 @@ Scenario: SCEN-REG-08 - Tipagem incorreta no e-mail ou payload não estruturado
   And o schema de resposta deve ser HTTPValidationError indicando erro de tipagem de string
 ```
 
-#### SCEN-REG-09: Rejeição ou sanitização estrita de injeção de campos extras (Mass Assignment Protection)
+#### SCEN-REG-09: Rejeição estrita de injeção de campos extras (Mass Assignment Protection)
 - **Endpoint**: `POST /api/v1/auth/register`
 - **Categoria**: Security / Mass Assignment Protection
 ```gherkin
@@ -200,8 +209,9 @@ Scenario: SCEN-REG-09 - Tentativa de injeção de atributos não mapeados em Use
     }
     """
   When o cliente envia uma requisição POST para "/api/v1/auth/register"
-  Then o código de status HTTP retornado deve ser 422 (se extra='forbid') OU 201 Created (se extra='ignore')
-  And se 201 Created for retornado, os campos extras não devem estar presentes na entidade criada e o atributo is_active deve obrigatoriamente permanecer true por padrão
+  Then o código de status HTTP retornado deve ser 422
+  And a resposta deve validar o schema HTTPValidationError detalhando rejeição de campos não permitidos
+  And como pós-condição, nenhum usuário deve ser cadastrado
 ```
 
 ---
@@ -254,7 +264,7 @@ Scenario: SCEN-LOG-02 - Tentativa de autenticação com senha inválida
     }
     """
   When o cliente envia uma requisição POST para "/api/v1/auth/login"
-  Then o código de status HTTP retornado deve ser 401 ou 422
+  Then o código de status HTTP retornado deve ser 401
   And nenhum token de acesso (access_token) deve ser emitido
   And a mensagem de erro não deve divulgar informações excessivas que permitam brute-force
 ```
@@ -273,7 +283,7 @@ Scenario: SCEN-LOG-03 - Tentativa de login com e-mail não cadastrado
     }
     """
   When o cliente envia uma requisição POST para "/api/v1/auth/login"
-  Then o código de status HTTP retornado deve ser 401 ou 422
+  Then o código de status HTTP retornado deve ser 401
   And nenhum token de acesso deve ser emitido
 ```
 
@@ -291,7 +301,7 @@ Scenario: SCEN-LOG-04 - Bloqueio de acesso para conta desativada
     }
     """
   When o cliente envia uma requisição POST para "/api/v1/auth/login"
-  Then o código de status HTTP retornado deve ser 401 ou 403
+  Then o código de status HTTP retornado deve ser 403
   And a emissão de token de acesso deve ser rejeitada
 ```
 
@@ -433,12 +443,11 @@ Scenario: SCEN-DEL-02 - Exclusão com limpeza em cascata de dados financeiros co
   When o cliente envia uma requisição DELETE para "/api/v1/auth/me" com o cabeçalho Bearer do usuário
   Then o código de status HTTP retornado deve ser 204
   And a operação não deve disparar violação de integridade referencial ou erro interno (500)
-  And como pós-condição no banco de dados:
-    | entidade_alvo | condicao_esperada                                           |
-    | users         | registro do usuário deletado                                |
-    | accounts      | todas as contas do user_id foram expurgadas                 |
-    | transactions  | todas as transações do user_id foram expurgadas             |
-    | investments   | todas as posições de investimento do user_id foram expurgadas|
+  And a validação de caixa-preta via HTTP deve comprovar que todos os identificadores criados tornam-se inacessíveis:
+    | verificacao_alvo | chamada_http                  | status_esperado |
+    | token revogado   | GET /api/v1/auth/me           | 401             |
+    | conta órfã       | GET /api/v1/accounts/{id}     | 401 ou 404      |
+    | transação órfã   | GET /api/v1/transactions/{id} | 401 ou 404      |
 ```
 
 #### SCEN-DEL-03: Revogação de acesso e bloqueio de login subsequente
@@ -448,7 +457,7 @@ Scenario: SCEN-DEL-02 - Exclusão com limpeza em cascata de dados financeiros co
 Scenario: SCEN-DEL-03 - Impossibilidade de login após exclusão da conta
   Given que um usuário "deleted_user_<unique>@example.com" teve sua conta excluída com sucesso via DELETE /api/v1/auth/me
   When o cliente tenta realizar novo login em "/api/v1/auth/login" usando as credenciais do usuário recém-deletado
-  Then o código de status HTTP retornado deve ser 401 ou 422
+  Then o código de status HTTP retornado deve ser 401
   And nenhum token de sessão deve ser gerado
 ```
 
@@ -478,7 +487,7 @@ Scenario: SCEN-DEL-05 - Tentativa não autorizada de exclusão de conta
 
 ### Edge Cases
 
-- **Colisão Concorrente de E-mails**: Duas requisições simultâneas de cadastro para o mesmo e-mail devem garantir que exatamente uma tenha sucesso (`201`) e a outra seja rejeitada (`422`/`409`), sem gerar inconsistência no banco de dados.
+- **Colisão Concorrente de E-mails**: Duas requisições simultâneas de cadastro para o mesmo e-mail devem garantir que exatamente uma tenha sucesso (`201`) e a outra seja rejeitada com `409 Conflict`, sem gerar inconsistência no banco de dados.
 - **Caracteres Especiais e Unicode no E-mail e Senha**: Validação de senhas com caracteres Unicode complexos, acentuações e símbolos especiais para assegurar que a codificação UTF-8 e a função de hash criptográfico (ex: bcrypt/argon2) processem a string sem truncamento silencioso.
 - **Tentativa de Reutilização de Identificador**: Após o hard delete de um usuário, uma nova tentativa de cadastro com o mesmo e-mail deve ser permitida como uma nova conta (gerando novo UUID distinto), desde que a política de privacidade permita re-cadastro.
 - **Deleção Concorrente com Criação de Transação**: Tentativa de registrar uma transação no exato momento em que o endpoint de deleção da conta está em execução deve resultar em consistência transacional (ou a transação é criada e deletada na cascata, ou falha com erro de autorização/entidade inexistente).
@@ -491,14 +500,14 @@ Scenario: SCEN-DEL-05 - Tentativa não autorizada de exclusão de conta
 ### Functional Requirements
 
 - **FR-001**: O sistema DEVE disponibilizar o endpoint `POST /api/v1/auth/register` para permitir o cadastro anônimo de novos usuários recebendo e-mail e senha.
-- **FR-002**: O sistema DEVE validar o formato de e-mail conforme a RFC de endereçamento e garantir a unicidade de e-mail na base cadastral, rejeitando duplicidades com código HTTP 422 ou 409.
+- **FR-002**: O sistema DEVE validar o formato de e-mail conforme a RFC de endereçamento e garantir a unicidade de e-mail na base cadastral, rejeitando duplicidades com código HTTP 409 Conflict.
 - **FR-003**: O sistema DEVE validar as regras de fronteira de senha no cadastro: tamanho mínimo obrigatório de 8 caracteres e tamanho máximo de 72 caracteres, rejeitando violações com código HTTP 422.
 - **FR-004**: O sistema DEVE retornar o código HTTP `201 Created` e a entidade `UserResponse` (`id` como UUID, `email`, `is_active: true`, `created_at` em ISO 8601) em caso de cadastro bem-sucedido.
 - **FR-005**: O sistema NÃO DEVE expor senhas em texto puro ou hashes criptográficos em nenhuma resposta da API.
-- **FR-006**: O sistema DEVE rejeitar tentativas de Mass Assignment no cadastro, não permitindo a sobrescrita de atributos de sistema como `is_active` ou criação de campos arbitrários.
+- **FR-006**: O sistema DEVE rejeitar tentativas de Mass Assignment no cadastro com código HTTP 422 Unprocessable Entity, aplicando validação estrita contra qualquer campo não mapeado no schema UserCreate.
 - **FR-007**: O sistema DEVE disponibilizar o endpoint `POST /api/v1/auth/login` para autenticar credenciais registradas e emitir o contrato `Token` (`access_token` JWT válido e `token_type: "bearer"`) com código HTTP `200 OK`.
-- **FR-008**: O sistema DEVE rejeitar tentativas de login com senha incorreta ou e-mail inexistente com resposta de erro genérica (401 ou 422) para mitigar enumeração de contas.
-- **FR-009**: O sistema DEVE impedir a autenticação de contas cujo atributo `is_active` esteja como `false`, retornando código 401 ou 403.
+- **FR-008**: O sistema DEVE rejeitar tentativas de login com senha incorreta ou e-mail inexistente com resposta de erro genérica (401 Unauthorized) para mitigar enumeração de contas.
+- **FR-009**: O sistema DEVE impedir a autenticação de contas cujo atributo `is_active` esteja como `false`, retornando código HTTP 403 Forbidden.
 - **FR-010**: O sistema DEVE disponibilizar o endpoint `GET /api/v1/auth/me` protegido por autenticação OAuth2 Bearer, retornando os dados do usuário autenticado no formato `UserResponse` com código HTTP `200 OK`.
 - **FR-011**: O sistema DEVE rejeitar requisições a `GET /api/v1/auth/me` e `DELETE /api/v1/auth/me` que não contenham token, que contenham token com assinatura inválida, formato incorreto ou token expirado, retornando código HTTP `401 Unauthorized`.
 - **FR-012**: O sistema DEVE disponibilizar o endpoint `DELETE /api/v1/auth/me` protegido por Bearer token para realizar a exclusão física imediata (Hard Delete) do usuário autenticado, retornando código HTTP `204 No Content` sem corpo de resposta.
@@ -525,7 +534,7 @@ Scenario: SCEN-DEL-05 - Tentativa não autorizada de exclusão de conta
 - **SC-002**: 100% das respostas de sucesso da API nos testes de Auth devem ser validadas contra os schemas `UserResponse` e `Token` do contrato OpenAPI sem desvios estruturais.
 - **SC-003**: 100% dos testes de erro de validação de schema devem comprovar a emissão de código HTTP `422 Unprocessable Entity` com schema aderente a `HTTPValidationError`.
 - **SC-004**: Zero dados sensíveis de credenciais (hashes de senha, senhas em texto puro ou chaves secretas de assinatura) devem ser expostos em logs de execução ou payloads de retorno da API.
-- **SC-005**: 100% das operações de exclusão de usuário com dados vinculados (`accounts`, `transactions`, `investments`) devem comprovar no pós-teste a ausência completa de registros órfãos no banco de dados e zero ocorrências de erro HTTP 500 por integridade referencial.
+- **SC-005**: 100% das operações de exclusão de usuário com dados vinculados (`accounts`, `transactions`, `investments`) devem comprovar via testes de caixa-preta HTTP a emissão de código HTTP `204 No Content` sem erro 500 de integridade referencial, seguida de inacessibilidade/revogação (`401`/`404`) de todos os identificadores vinculados.
 - **SC-006**: Todos os cenários da suíte de testes devem ser executáveis de forma independente e concorrente (mínimo de 3 threads paralelas) com taxa de falhas por concorrência ou colisão de dados igual a 0%.
 
 ---
@@ -533,7 +542,8 @@ Scenario: SCEN-DEL-05 - Tentativa não autorizada de exclusão de conta
 ## Assumptions
 
 - **Padrão de Dados Sintéticos**: Cada execução de teste gerará seus próprios dados dinâmicos (e-mails com sufixos únicos e senhas aleatórias aderentes às regras) para viabilizar execução paralela em múltiplas threads sem dependência de massa estática pré-carregada.
-- **Padrão de Status Code para Conflitos Cadastrais**: Em caso de tentativa de cadastro com e-mail duplicado, a API retorna erro de validação ou conflito (HTTP 422 ou 409), conforme previsto no schema de validação da aplicação.
-- **Comportamento de Campos Extras (Mass Assignment)**: O backend está configurado para rejeitar (`422`) ou ignorar atributos adicionais não declarados em `UserCreate`, garantindo que campos sensíveis não sejam injetados.
+- **Padrão de Status Code para Conflitos Cadastrais**: Em caso de tentativa de cadastro com e-mail duplicado, a API retorna erro de conflito (HTTP 409 Conflict) para violação de unicidade cadastral.
+- **Comportamento de Campos Extras (Mass Assignment)**: O backend está configurado com validação estrita (`extra='forbid'`) para rejeitar com HTTP 422 qualquer payload contendo atributos adicionais não declarados em `UserCreate`.
 - **Mecanismo de Desativação de Contas**: O status `is_active` é assumido como `true` por padrão no cadastro; para testar contas desativadas (`is_active = false`), assume-se a existência de controle administrativo ou alteração direta de estado para fins de validação do gate de segurança no login.
 - **Conformidade com a Constituição do Repositório**: A automação destes cenários seguirá estritamente a Constituição ratificada em `.specify/memory/constitution.md`, incluindo desacoplamento de payloads externos, geração de dados via Datafaker (`pt-BR`) e ausência de segredos versionados.
+- **Estratégia de Validação em Caixa-Preta (Sem JDBC)**: Os testes em Karate DSL executam asserções estritamente via camada de API HTTP (validando status 204, ausência de erro 500 e inacessibilidade 401/404 de recursos excluídos), dispensando dependência de conexões diretas de banco de dados via JDBC.
