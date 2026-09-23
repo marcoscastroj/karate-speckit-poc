@@ -42,7 +42,7 @@ Feature files MUST act as executable specifications. Scenarios and step descript
 ### VI. Mandatory QA Coverage Matrix & Status Code Assertions
 Every feature specification generated for an endpoint MUST explicitly provide test scenarios for:
 1. **Happy Path**: Successful creation/retrieval (200/201) asserting the complete response schema against `openapi.json`.
-2. **Payload & Boundary Validations**: Negative flows (400 or 422) for missing required fields, empty strings, invalid types, and business boundary limits defined in `user-story.md`.
+2. **Payload & Boundary Validations**: Negative flows (400 or 422) for missing required fields, empty strings, invalid types, and business boundary limits defined.
 3. **Authentication & Authorization**: Missing/invalid token (401) and forbidden access (403), where secured.
 4. **Resource Non-Existence**: Not found flows (404) for random or non-existent IDs.
 5. **Business Conflict**: Duplicate resource or unique-constraint violation (409 Conflict), where applicable.
