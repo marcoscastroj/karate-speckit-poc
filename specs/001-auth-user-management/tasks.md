@@ -8,7 +8,7 @@
 
 **Purpose**: Inicialização das configurações de ambiente, estrutura de dados e geradores dinâmicos de teste.
 
-- [ ] T001 Configurar endpoint e timeouts da API Finance Organizer em `src/test/resources/config/environments.json`
+- [ ] T001 Configurar endpoint canônico (`http://100.75.210.114:8000`) e timeouts da API Finance Organizer em `src/test/resources/config/environments.json`
 - [ ] T002 [P] Criar diretórios de payloads e schemas em `src/test/resources/data/payloads/auth/` e `src/test/resources/data/schemas/auth/`
 - [ ] T003 [P] Implementar geradores de senhas de fronteira (8, 72, 7 e 73 caracteres) em `src/test/java/utils/DataGenerator.java`
 

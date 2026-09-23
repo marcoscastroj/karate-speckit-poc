@@ -12,7 +12,7 @@ Este guia orienta a execução, validação e auditoria dos testes automatizados
 
 - **Java Development Kit**: Java 21 LTS instalado (`java -version`).
 - **Apache Maven**: Versão 3.9+ instalada (`mvn -version`).
-- **API Target em Execução**: Backend da API Finance Organizer ativo no host/porta configurado em `src/test/resources/config/environments.json` (padrão: `http://localhost:8000`).
+- **API Target em Execução**: Backend da API Finance Organizer ativo no host/porta configurado em `src/test/resources/config/environments.json` (alvo canônico: `http://100.75.210.114:8000` conforme Constituição v1.1.0).
 
 ---
 
