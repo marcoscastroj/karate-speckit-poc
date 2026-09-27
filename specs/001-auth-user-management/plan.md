@@ -1,4 +1,4 @@
-# Implementation Plan: Autenticação e Gestão de Usuário (Auth API Test Automation)
+    # Implementation Plan: Autenticação e Gestão de Usuário (Auth API Test Automation)
 
 **Branch**: `001-auth-user-management` | **Date**: 2026-09-23 | **Spec**: [specs/001-auth-user-management/spec.md](spec.md)
 
