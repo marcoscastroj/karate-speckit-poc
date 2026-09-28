@@ -1,0 +1,7 @@
+{
+  "id": "#uuid",
+  "user_id": "#uuid",
+  "apelido": "#string",
+  "saldo_calculado": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "created_at": "#regex ^\\d{4}-\\d{2}-\\d{2}T.*"
+}
