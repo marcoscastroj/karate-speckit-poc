@@ -1,13 +1,8 @@
 function fn() {
-  var System = Java.type('java.lang.System');
+  var CredentialUtils = Java.type('utils.CredentialUtils');
 
-  // Helper para buscar de variavel de ambiente do SO ou de system property (-Dkey=value)
   var getEnvOrProp = function(key, defaultValue) {
-    var val = System.getenv(key);
-    if (!val || val.trim().length === 0) {
-      val = System.getProperty(key);
-    }
-    return val && val.trim().length > 0 ? val : defaultValue;
+    return CredentialUtils.getEnv(key, defaultValue);
   };
 
   return {
