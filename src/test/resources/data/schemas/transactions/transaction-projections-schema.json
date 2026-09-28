@@ -1,0 +1,8 @@
+{
+  "mes": "#number",
+  "ano": "#number",
+  "conta_id": "##uuid",
+  "receitas_previstas": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "despesas_previstas": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "saldo_projetado": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+}
