@@ -16,8 +16,14 @@ public class TestRunner {
 
         String customTags = System.getProperty("karate.tags");
         if (customTags != null && !customTags.trim().isEmpty()) {
-            // Se tags customizadas forem passadas (-Dkarate.tags="@users"), inclui elas e garante a exclusão de @ignore
-            builder.tags(customTags, "~@ignore");
+            // Suporta múltiplas tags combinadas com 'and' (ex: '@investments and @smoke')
+            String[] tags = customTags.split("\\s+and\\s+");
+            for (String tag : tags) {
+                if (!tag.trim().isEmpty()) {
+                    builder.tags(tag.trim());
+                }
+            }
+            builder.tags("~@ignore");
         } else {
             // Por padrão, ignora qualquer cenário ou feature marcado com @ignore
             builder.tags("~@ignore");
