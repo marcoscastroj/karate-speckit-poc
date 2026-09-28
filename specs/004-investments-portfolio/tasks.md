@@ -95,7 +95,7 @@
 
 - [ ] T033 [US4] Criar arquivo de feature com Background, tags `@investments` e `@detail`, e importação do `auth-helper.feature` em `src/test/java/features/investments/investments-get.feature`
 - [ ] T034 [US4] Implementar cenário feliz de consulta por ID próprio SCEN-INV-22 validando contrato `InvestmentResponse` em `src/test/java/features/investments/investments-get.feature`
-- [ ] T035 [US4] Implementar cenário de defesa contra IDOR SCEN-INV-23 (Usuário A tentando consultar investimento do Usuário B com 404 ou 403) em `src/test/java/features/investments/investments-get.feature`
+- [ ] T035 [US4] Implementar cenário de defesa contra IDOR SCEN-INV-23 com tags `@idor` e `@security` (Usuário A tentando consultar investimento do Usuário B com 404 ou 403) em `src/test/java/features/investments/investments-get.feature`
 - [ ] T036 [P] [US4] Implementar cenário de ID inexistente SCEN-INV-24 (UUID inexistente com 404) em `src/test/java/features/investments/investments-get.feature`
 - [ ] T037 [P] [US4] Implementar cenário de ID malformado SCEN-INV-25 (não-UUID com 422) em `src/test/java/features/investments/investments-get.feature`
 - [ ] T038 [P] [US4] Implementar cenário de consulta sem autenticação SCEN-INV-26 (com 401) em `src/test/java/features/investments/investments-get.feature`
@@ -115,7 +115,7 @@
 - [ ] T041 [US5] Implementar cenário de atualização de quantidade e preço médio SCEN-INV-28 em `src/test/java/features/investments/investments-update.feature`
 - [ ] T042 [US5] Implementar cenário de reflexo imediato do PUT no consolidado `/investments/summary` SCEN-INV-29 em `src/test/java/features/investments/investments-update.feature`
 - [ ] T043 [P] [US5] Implementar cenários de validação negativa SCEN-INV-30 (quantidade <= 0, preco_medio < 0, cotacao_atual < 0, limites de string com 422) em `src/test/java/features/investments/investments-update.feature`
-- [ ] T044 [US5] Implementar cenário de defesa contra IDOR na atualização SCEN-INV-31 (Usuário A tentando alterar ativo do Usuário B com 404 ou 403) em `src/test/java/features/investments/investments-update.feature`
+- [ ] T044 [US5] Implementar cenário de defesa contra IDOR na atualização SCEN-INV-31 com tags `@idor` e `@security` (Usuário A tentando alterar ativo do Usuário B com 404 ou 403) em `src/test/java/features/investments/investments-update.feature`
 - [ ] T045 [P] [US5] Implementar cenários de ID inexistente SCEN-INV-32 (404) e ID não-UUID SCEN-INV-33 (422) em `src/test/java/features/investments/investments-update.feature`
 - [ ] T046 [P] [US5] Implementar cenário de atualização sem autenticação SCEN-INV-34 (com 401) em `src/test/java/features/investments/investments-update.feature`
 
@@ -133,7 +133,7 @@
 - [ ] T048 [US6] Implementar cenário feliz de exclusão de ativo próprio SCEN-INV-35 (com 204 No Content) em `src/test/java/features/investments/investments-delete.feature`
 - [ ] T049 [US6] Implementar cenário de verificação de persistência SCEN-INV-36 (GET subsequente retorna 404 Not Found) em `src/test/java/features/investments/investments-delete.feature`
 - [ ] T050 [US6] Implementar cenário de impacto dinâmico no resumo da carteira SCEN-INV-37 (decremento imediato do ativo excluído em `/investments/summary`) em `src/test/java/features/investments/investments-delete.feature`
-- [ ] T051 [US6] Implementar cenário de defesa contra IDOR na exclusão SCEN-INV-38 (Usuário A tentando excluir ativo do Usuário B com 404 ou 403) em `src/test/java/features/investments/investments-delete.feature`
+- [ ] T051 [US6] Implementar cenário de defesa contra IDOR na exclusão SCEN-INV-38 com tags `@idor` e `@security` (Usuário A tentando excluir ativo do Usuário B com 404 ou 403) em `src/test/java/features/investments/investments-delete.feature`
 - [ ] T052 [P] [US6] Implementar cenários de ID inexistente SCEN-INV-39 (404) e ID malformado SCEN-INV-40 (422) em `src/test/java/features/investments/investments-delete.feature`
 - [ ] T053 [P] [US6] Implementar cenário de exclusão sem autenticação SCEN-INV-41 (com 401) em `src/test/java/features/investments/investments-delete.feature`
 
@@ -146,7 +146,7 @@
 **Purpose**: Execução ponta a ponta, validação de paralelismo e geração do relatório consolidado de testes.
 
 - [ ] T054 Executar a suíte completa de testes de investimentos em paralelo com 3 threads (`mvn test -Dkarate.tags="@investments"`)
-- [ ] T055 Executar suíte de testes de segurança IDOR em `mvn test -Dkarate.tags="@idor and @investments"`
+- [ ] T055 Executar suíte de testes de segurança IDOR em `mvn test -Dkarate.tags="(@idor or @security) and @investments"`
 - [ ] T056 [P] Validar geração do relatório consolidado em `target/karate-reports/karate-summary.html`
 - [ ] T057 Validar ausência de tokens ou segredos expostos em logs e conformidade com o Zero-Failure Standard (`results.getFailCount() == 0`)
 

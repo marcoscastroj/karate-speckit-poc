@@ -62,6 +62,8 @@ mvn test -Dkarate.tags="@investments and @smoke"
 * **Testes de Segurança e Proteção Anti-IDOR (Multi-tenancy)**:
   ```bash
   mvn test -Dkarate.tags="@idor and @investments"
+  # ou via tag de segurança:
+  mvn test -Dkarate.tags="@security and @investments"
   ```
 
 ---

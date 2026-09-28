@@ -31,7 +31,7 @@ A solução técnica adota Java 21 LTS e Karate DSL JUnit 5 com execução paral
 - Princípio II: Desacoplamento de payloads em `src/test/resources/data/payloads/investments/`
 - Princípio III: Geração dinâmica de dados via `DataGenerator` e sufixos aleatórios para tickers
 - Princípio IV: Zero exposição de segredos em código versionado e logs
-- Princípio V: Tagging padronizado (`@investments`, `@smoke`, `@regression`, `@create`, `@summary`, `@list`, `@detail`, `@update`, `@delete`, `@idor`)
+- Princípio V: Tagging padronizado (`@investments`, `@smoke`, `@regression`, `@create`, `@summary`, `@list`, `@detail`, `@update`, `@delete`, `@idor`, `@security`)
 - Princípio VI: Matriz completa de cobertura de status codes (200, 201, 204, 401, 404, 422)
 - Princípio VII: Reusabilidade obrigatória via `auth-helper.feature` e `investment-helper.feature` com `karate.call` (eliminação de duplicação inline de setup)
 
@@ -47,7 +47,7 @@ A solução técnica adota Java 21 LTS e Karate DSL JUnit 5 com execução paral
 | **II. Payload Decoupling & Schema Payloads** | Payloads desacoplados em `src/test/resources/data/payloads/` | **PASS** | Payloads base `investment-create-request.json` e `investment-update-request.json` externalizados; schemas fuzzy matchers sob `schemas/investments/`. |
 | **III. Dynamic Data & Synthetic Generation** | Uso de Datafaker (`pt-BR`) e tickers/nomes dinâmicos | **PASS** | Nomes de ativos e identificadores gerados com sufixos aleatórios; valores numéricos parametrizados sem dados sensíveis. |
 | **IV. Zero-Secret Exposure & Parity** | Zero credenciais no git, configuração por ambiente | **PASS** | `environments.json` e `credentials-reader.js` com variáveis de ambiente; mascaramento de headers sensíveis no `logback-test.xml`. |
-| **V. Living Specifications & Tagging** | Especificações executáveis com tags estruturadas | **PASS** | Features organizadas com tags `@investments`, `@smoke`, `@create`, `@summary`, `@list`, `@detail`, `@update`, `@delete`, `@idor`. |
+| **V. Living Specifications & Tagging** | Especificações executáveis com tags estruturadas | **PASS** | Features organizadas com tags `@investments`, `@smoke`, `@create`, `@summary`, `@list`, `@detail`, `@update`, `@delete`, `@idor`, `@security`. |
 | **VI. Mandatory QA Coverage Matrix** | Happy path, boundaries, 401, 404, 422 | **PASS** | Matriz com 41 cenários cobrindo 100% dos status codes definidos, validações de limites, IDOR e agregação multi-classe. |
 | **VII. Code Reusability & DRY Helpers** | Helpers reutilizáveis obrigatórios via `karate.call` | **PASS** | Todos os cenários autenticados consomem `auth-helper.feature` via `karate.call`; setup de custódia reutilizável via `investment-helper.feature`. |
 

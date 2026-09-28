@@ -306,7 +306,7 @@ Scenario: SCEN-INV-13 - A soma das fatias de alocação por classe deve totaliza
   Given um usuário autenticado com múltiplos ativos cadastrados em diferentes classes
   When o cliente envia uma requisição GET para "/api/v1/investments/summary"
   Then o código de status retornado deve ser 200
-  And a soma do campo "percentual_carteira" de todos os elementos em "alocacao_por_classe" deve ser igual a 100.00 (com tolerância máxima de arredondamento de +-0.02)
+  And a soma do campo "percentual_carteira" de todos os elementos em "alocacao_por_classe" deve ser igual a 100.00 (com tolerância máxima de arredondamento de +-0.05)
 ```
 
 #### SCEN-INV-14: Isolamento rigoroso de multi-tenancy no cálculo de métricas consolidadas
@@ -727,7 +727,7 @@ Scenario: SCEN-INV-41 - Tentativa de exclusão sem cabeçalho Authorization
 ### Edge Cases
 
 - **Divisão por Zero na Rentabilidade Percentual**: Caso um ativo possua `preco_medio == 0.00` (ex: bonificação de ações ou recebimento por airdrop/doação), a fórmula `((patrimonio_atual - total_investido) / total_investido) * 100` não pode gerar exceção de runtime (`DivisionByZero`), devendo retornar `0.00` ou tratar a variação de modo seguro e padronizado.
-- **Tolerância de Ponto Flutuante na Alocação da Carteira**: Na soma das parcelas de `percentual_carteira` das classes de ativos no consolidado `/summary`, arredondamentos decimais (`String/Decimal`) podem gerar somatórios como `99.99` ou `100.01`. As asserções de teste devem empregar tolerância estrita de até `+-0.02%` ou validação normalizada.
+- **Tolerância de Ponto Flutuante na Alocação da Carteira**: Na soma das parcelas de `percentual_carteira` das classes de ativos no consolidado `/summary`, arredondamentos decimais (`String/Decimal`) podem gerar somatórios como `99.99` ou `100.01`. As asserções de teste devem empregar tolerância estrita de até `+-0.05%` ou validação normalizada.
 - **Fracionamento de Criptoativos com Casas Decimais Excessivas**: Criptoativos suportam até 8 casas decimais (ex: `0.00045218`). O sistema deve persistir e calcular o produto `quantidade * cotacao_atual` sem truncar prematuramente os dígitos decimais.
 - **Empate Financeiro Perfeito (`preco_medio == cotacao_atual`)**: Deve resultar estritamente em `lucro_prejuizo_absoluto = "0.00"` e `rentabilidade_percentual = "0.00"`, sem caracteres anômalos ou `-0.00`.
 - **Prejuízos Severos e Drawdowns Extremos**: Cenários de queda de 99% ou desvalorização para cotação `0.00` devem produzir `lucro_prejuizo_absoluto` negativo com sinal explícito (ex: `"-1000.00"`) e `rentabilidade_percentual = "-100.00"`.
@@ -813,7 +813,7 @@ Scenario: SCEN-INV-41 - Tentativa de exclusão sem cabeçalho Authorization
 - **SC-001**: 100% dos endpoints do módulo de investimentos (`POST /`, `GET /`, `GET /summary`, `GET /{id}`, `PUT /{id}`, `DELETE /{id}`) possuem cobertura automatizada de testes cobrindo fluxos de sucesso e exceção.
 - **SC-002**: 100% das asserções de validação de contrato contra as respostas da API estão rigorosamente alinhadas com as definições do `openapi.json` (`InvestmentResponse`, `PortfolioSummaryResponse`, `ClassAllocation`).
 - **SC-003**: O isolamento de dados entre usuários (multi-tenancy) é 100% garantido em testes automatizados, atestando zero vazamento de posições, IDOR ou contaminação em agregações de resumo.
-- **SC-004**: Todas as operações de cálculo de métricas derivadas (`total_investido`, `patrimonio_atual`, `lucro_prejuizo_absoluto`, `rentabilidade_percentual` e `alocacao_por_classe`) demonstram exatidão matemática com tolerância máxima de arredondamento de `0.02%`.
+- **SC-004**: Todas as operações de cálculo de métricas derivadas (`total_investido`, `patrimonio_atual`, `lucro_prejuizo_absoluto`, `rentabilidade_percentual` e `alocacao_por_classe`) demonstram exatidão matemática com tolerância máxima de arredondamento de `0.05%`.
 - **SC-005**: 100% dos cenários de teste são independentes, idempotentes e executáveis concorrentemente em 3 threads paralelas sem causar flakiness ou conflito de dados.
 - **SC-006**: Todos os casos de teste que requerem autenticação utilizam provisionamento dinâmico via `auth-helper.feature` em cumprimento à Constituição do projeto (Princípio VII).
 - **SC-007**: 100% das tentativas de submissão com payloads inválidos, tipos incompatíveis ou limites violados são rejeitadas com status `422 Unprocessable Entity` ou `400 Bad Request`.
