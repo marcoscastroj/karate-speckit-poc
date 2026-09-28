@@ -1,0 +1,12 @@
+{
+  "id": "#uuid",
+  "user_id": "#uuid",
+  "conta_id": "#uuid",
+  "valor": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d{0,2}0*$",
+  "tipo": "#regex ^(RECEITA|DESPESA)$",
+  "status": "#regex ^(EFETIVADA|AGENDADA)$",
+  "data": "#regex ^\\d{4}-\\d{2}-\\d{2}$",
+  "descricao": "#string",
+  "recorrencia": "#regex ^(UNICA|SEMANAL|MENSAL|ANUAL)$",
+  "created_at": "#regex ^\\d{4}-\\d{2}-\\d{2}T.*"
+}
