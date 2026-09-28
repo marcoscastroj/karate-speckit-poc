@@ -7,67 +7,30 @@ Feature: User Story 4 - Exclusao Imediata da Conta e Efeito Cascata Transacional
   Background:
     * url baseUrl
     * def mePath = '/api/v1/auth/me'
-    * def registerPath = '/api/v1/auth/register'
     * def loginPath = '/api/v1/auth/login'
     * def accountsPath = '/api/v1/accounts/'
     * configure retry = { count: 12, interval: 10000 }
 
   @smoke @happy_path
   Scenario: SCEN-DEL-01 - Exclusao imediata de usuario simples
-    # 1. Cadastro e Login
-    * def userEmail = dataGenerator.getRandomEmail()
-    * def userPassword = dataGenerator.getRandomValidPassword()
-    * def regPayload = read('classpath:data/payloads/auth/register-request.json')
-    * set regPayload.email = userEmail
-    * set regPayload.password = userPassword
-    Given path registerPath
-    And request regPayload
-    When method post
-    Then status 201
-
-    Given path loginPath
-    * def loginPayload = read('classpath:data/payloads/auth/login-request.json')
-    * set loginPayload.email = userEmail
-    * set loginPayload.password = userPassword
-    And request loginPayload
-    And retry until responseStatus != 429
-    When method post
-    Then status 200
-    * def authToken = response.access_token
+    # 1. Setup autocontido via auth-helper
+    * def auth = call read('classpath:features/helpers/auth-helper.feature')
 
     # 2. Exclusao da conta (Hard Delete)
     Given path mePath
-    And header Authorization = 'Bearer ' + authToken
+    And header Authorization = auth.authHeader
     When method delete
     Then status 204
     And match response == ''
 
   @cascade @happy_path
   Scenario: SCEN-DEL-02 - Exclusao com limpeza em cascata de dados correlacionados
-    # 1. Setup de usuario e autenticacao
-    * def userEmail = dataGenerator.getRandomEmail()
-    * def userPassword = dataGenerator.getRandomValidPassword()
-    * def regPayload = read('classpath:data/payloads/auth/register-request.json')
-    * set regPayload.email = userEmail
-    * set regPayload.password = userPassword
-    Given path registerPath
-    And request regPayload
-    When method post
-    Then status 201
-
-    Given path loginPath
-    * def loginPayload = read('classpath:data/payloads/auth/login-request.json')
-    * set loginPayload.email = userEmail
-    * set loginPayload.password = userPassword
-    And request loginPayload
-    And retry until responseStatus != 429
-    When method post
-    Then status 200
-    * def authToken = response.access_token
+    # 1. Setup de usuario e autenticacao via auth-helper
+    * def auth = call read('classpath:features/helpers/auth-helper.feature')
 
     # 2. Criacao de recurso filho (Carteira/Conta)
     Given path accountsPath
-    And header Authorization = 'Bearer ' + authToken
+    And header Authorization = auth.authHeader
     And request { apelido: 'Carteira de Teste Cascata' }
     When method post
     Then status 201
@@ -75,45 +38,32 @@ Feature: User Story 4 - Exclusao Imediata da Conta e Efeito Cascata Transacional
 
     # 3. Disparo do DELETE da conta do usuario
     Given path mePath
-    And header Authorization = 'Bearer ' + authToken
+    And header Authorization = auth.authHeader
     When method delete
     Then status 204
 
     # 4. Validacao de inacessibilidade pos-exclusao (token e conta orfa)
     Given path accountsPath + accountId
-    And header Authorization = 'Bearer ' + authToken
+    And header Authorization = auth.authHeader
     When method get
     Then assert responseStatus == 401 || responseStatus == 404
 
   @security @post_delete
   Scenario: SCEN-DEL-03 - Impossibilidade de login apos exclusao da conta
-    * def userEmail = dataGenerator.getRandomEmail()
-    * def userPassword = dataGenerator.getRandomValidPassword()
-    * def regPayload = read('classpath:data/payloads/auth/register-request.json')
-    * set regPayload.email = userEmail
-    * set regPayload.password = userPassword
-    Given path registerPath
-    And request regPayload
-    When method post
-    Then status 201
+    # 1. Setup de usuario e autenticacao via auth-helper
+    * def auth = call read('classpath:features/helpers/auth-helper.feature')
 
-    Given path loginPath
-    * def loginPayload = read('classpath:data/payloads/auth/login-request.json')
-    * set loginPayload.email = userEmail
-    * set loginPayload.password = userPassword
-    And request loginPayload
-    And retry until responseStatus != 429
-    When method post
-    Then status 200
-    * def authToken = response.access_token
-
+    # 2. Exclusao da conta
     Given path mePath
-    And header Authorization = 'Bearer ' + authToken
+    And header Authorization = auth.authHeader
     When method delete
     Then status 204
 
-    # Tentativa de novo login com as credenciais deletadas
+    # 3. Tentativa de novo login com as credenciais deletadas
     Given path loginPath
+    * def loginPayload = read('classpath:data/payloads/auth/login-request.json')
+    * set loginPayload.email = auth.userEmail
+    * set loginPayload.password = auth.userPassword
     And request loginPayload
     And retry until responseStatus != 429
     When method post
@@ -122,34 +72,18 @@ Feature: User Story 4 - Exclusao Imediata da Conta e Efeito Cascata Transacional
 
   @security @post_delete
   Scenario: SCEN-DEL-04 - Rejeicao de token de sessao previamente emitido apos exclusao
-    * def userEmail = dataGenerator.getRandomEmail()
-    * def userPassword = dataGenerator.getRandomValidPassword()
-    * def regPayload = read('classpath:data/payloads/auth/register-request.json')
-    * set regPayload.email = userEmail
-    * set regPayload.password = userPassword
-    Given path registerPath
-    And request regPayload
-    When method post
-    Then status 201
+    # 1. Setup de usuario e autenticacao via auth-helper
+    * def auth = call read('classpath:features/helpers/auth-helper.feature')
 
-    Given path loginPath
-    * def loginPayload = read('classpath:data/payloads/auth/login-request.json')
-    * set loginPayload.email = userEmail
-    * set loginPayload.password = userPassword
-    And request loginPayload
-    And retry until responseStatus != 429
-    When method post
-    Then status 200
-    * def authToken = response.access_token
-
+    # 2. Exclusao da conta
     Given path mePath
-    And header Authorization = 'Bearer ' + authToken
+    And header Authorization = auth.authHeader
     When method delete
     Then status 204
 
-    # Tentativa de reusar o token para consultar /me
+    # 3. Tentativa de reusar o token para consultar /me
     Given path mePath
-    And header Authorization = 'Bearer ' + authToken
+    And header Authorization = auth.authHeader
     When method get
     Then status 401
     And match response.id == '#notpresent'

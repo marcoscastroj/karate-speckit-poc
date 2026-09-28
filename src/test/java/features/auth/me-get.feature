@@ -7,42 +7,21 @@ Feature: User Story 3 - Consulta de Perfil do Usuario Autenticado (GET /api/v1/a
   Background:
     * url baseUrl
     * def mePath = '/api/v1/auth/me'
-    * def registerPath = '/api/v1/auth/register'
-    * def loginPath = '/api/v1/auth/login'
     * def userResponseSchema = read('classpath:data/schemas/auth/user-response-schema.json')
     * configure retry = { count: 12, interval: 10000 }
 
   @smoke @happy_path
   Scenario: SCEN-ME-01 - Obtencao dos dados do usuario logado via token valido
-    # 1. Cadastro de usuario
-    * def userEmail = dataGenerator.getRandomEmail()
-    * def userPassword = dataGenerator.getRandomValidPassword()
-    * def regPayload = read('classpath:data/payloads/auth/register-request.json')
-    * set regPayload.email = userEmail
-    * set regPayload.password = userPassword
-    Given path registerPath
-    And request regPayload
-    When method post
-    Then status 201
+    # 1. Autenticacao e provisionamento de usuario dinamico via helper reutilizavel
+    * def auth = call read('classpath:features/helpers/auth-helper.feature')
 
-    # 2. Login para obtencao de token JWT
-    Given path loginPath
-    * def loginPayload = read('classpath:data/payloads/auth/login-request.json')
-    * set loginPayload.email = userEmail
-    * set loginPayload.password = userPassword
-    And request loginPayload
-    And retry until responseStatus != 429
-    When method post
-    Then status 200
-    * def authToken = response.access_token
-
-    # 3. Consulta ao perfil do usuario logado
+    # 2. Consulta ao perfil do usuario logado
     Given path mePath
-    And header Authorization = 'Bearer ' + authToken
+    And header Authorization = auth.authHeader
     When method get
     Then status 200
     And match response == userResponseSchema
-    And match response.email == userEmail
+    And match response.email == auth.userEmail
     And match response.is_active == true
     And match response.password == '#notpresent'
     And match response.hashed_password == '#notpresent'
