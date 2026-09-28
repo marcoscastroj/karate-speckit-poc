@@ -171,3 +171,14 @@ Task T019: "Implementar cenários de validação de payload SCEN-LOG-05"
 4. Entregar US3 (Perfil / Segurança de Headers / Zero Leaks) → Testar com `@me`.
 5. Entregar US4 (Hard Delete / Cascata / Revogação) → Testar com `@delete`.
 6. Concluir Polish e validação paralela de 3 threads com `@auth`.
+
+---
+
+## Phase 8: Convergence
+
+**Purpose**: Alinhamento das features com o Princípio VII da Constituição (Code Reusability & DRY Helpers) e as diretrizes das skills `karate-reusability-and-dry` e `karate-authoring`.
+
+- [ ] T034 [CRITICAL] Refatorar cenário SCEN-ME-01 em `src/test/java/features/auth/me-get.feature` para utilizar `auth-helper.feature` via `karate.call` per Constitution VII (contradicts)
+- [ ] T035 [CRITICAL] Refatorar cenários de exclusão e cascata SCEN-DEL-01 a SCEN-DEL-04 em `src/test/java/features/auth/me-delete.feature` para utilizar `auth-helper.feature` via `karate.call` per Constitution VII (contradicts)
+- [ ] T036 [HIGH] Executar validação regressiva completa da suíte auth com `mvn test` garantindo 0 falhas e inspecionar `target/karate-reports/karate-summary.html` per Constitution I, V e VII (missing)
+
