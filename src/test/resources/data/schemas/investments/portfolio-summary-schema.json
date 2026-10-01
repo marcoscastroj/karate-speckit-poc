@@ -1,0 +1,7 @@
+{
+  "patrimonio_total": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "total_investido": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "lucro_prejuizo_absoluto": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "rentabilidade_percentual": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "alocacao_por_classe": "#array"
+}

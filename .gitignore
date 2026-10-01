@@ -38,3 +38,9 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Segredos e Variaveis de Ambiente Locais ###
+.env
+.env.*
+!.env.example
+credentials.properties

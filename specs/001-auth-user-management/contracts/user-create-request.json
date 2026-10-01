@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UserCreate",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string",
+      "format": "email",
+      "title": "Email"
+    },
+    "password": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 72,
+      "title": "Password",
+      "description": "Senha deve ter no mínimo 8 caracteres e no máximo 72 caracteres"
+    }
+  },
+  "required": [
+    "email",
+    "password"
+  ],
+  "additionalProperties": false
+}

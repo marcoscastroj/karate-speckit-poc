@@ -1,14 +1,14 @@
 {
   "dev": {
-    "baseUrl": "https://jsonplaceholder.typicode.com",
-    "timeout": 5000
+    "baseUrl": "http://100.75.210.114:8000",
+    "timeout": 10000
   },
   "qa": {
-    "baseUrl": "https://jsonplaceholder.typicode.com",
+    "baseUrl": "http://100.75.210.114:8000",
     "timeout": 10000
   },
   "e2e": {
-    "baseUrl": "https://jsonplaceholder.typicode.com",
+    "baseUrl": "http://100.75.210.114:8000",
     "timeout": 15000
   }
 }

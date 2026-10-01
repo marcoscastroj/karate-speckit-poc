@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Token",
+  "type": "object",
+  "properties": {
+    "access_token": {
+      "type": "string",
+      "title": "Access Token"
+    },
+    "token_type": {
+      "type": "string",
+      "title": "Token Type",
+      "default": "bearer"
+    }
+  },
+  "required": [
+    "access_token"
+  ],
+  "additionalProperties": false
+}

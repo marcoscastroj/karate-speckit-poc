@@ -1,0 +1,6 @@
+{
+  "classe": "#regex ^(ACOES|FIIS|RENDA_FIXA|CRIPTO|ETF|RENDA_EMERGENCIAL)$",
+  "patrimonio_total": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "total_investido": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "percentual_carteira": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+}

@@ -1,0 +1,8 @@
+{
+  "valor": 1500.50,
+  "tipo": "RECEITA",
+  "data": "2026-09-28",
+  "descricao": "Salário Mensal",
+  "conta_id": "00000000-0000-0000-0000-000000000000",
+  "recorrencia": "UNICA"
+}

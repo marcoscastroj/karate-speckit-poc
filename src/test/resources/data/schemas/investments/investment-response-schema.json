@@ -1,0 +1,16 @@
+{
+  "id": "#uuid",
+  "user_id": "#uuid",
+  "ticker": "#string",
+  "nome": "#string",
+  "classe": "#regex ^(ACOES|FIIS|RENDA_FIXA|CRIPTO|ETF|RENDA_EMERGENCIAL)$",
+  "quantidade": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "preco_medio": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "cotacao_atual": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "total_investido": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "patrimonio_atual": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "lucro_prejuizo_absoluto": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "rentabilidade_percentual": "#regex ^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+  "created_at": "#regex ^\\d{4}-\\d{2}-\\d{2}T.*",
+  "updated_at": "#regex ^\\d{4}-\\d{2}-\\d{2}T.*"
+}

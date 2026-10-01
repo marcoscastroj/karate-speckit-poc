@@ -22,9 +22,10 @@ function fn() {
     credentialUtils: credentialUtils
   };
 
-  // 4. Configuracoes globais do Karate (timeouts, ssl, etc.)
+  // 4. Configuracoes globais do Karate (timeouts, ssl, retry, etc.)
   karate.configure('connectTimeout', config.timeout);
   karate.configure('readTimeout', config.timeout);
+  karate.configure('retry', { count: 12, interval: 10000 });
 
   return config;
 }
