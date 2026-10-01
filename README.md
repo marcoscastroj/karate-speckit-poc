@@ -2,6 +2,15 @@
 
 Projeto de automação de testes de API estruturado com as melhores práticas de arquitetura para **Karate DSL**, utilizando **Java 21**, **Maven**, **JUnit 5** e **Datafaker**.
 
+## 📝 Considerações sobre SpecKit e qualidade
+
+Esta POC também registra aprendizados sobre o uso de IA com SpecKit na
+especificação e implementação de testes de API, incluindo a importância
+do contexto de negócio, das skills de Karate DSL e da validação dos
+cenários produzidos.
+
+Leia as [considerações sobre o uso do SpecKit com foco em qualidade](docs/consideracoes-speckit-qualidade.md).
+
 ---
 
 ## 📁 Arquitetura do Projeto
@@ -120,4 +129,3 @@ O repositório inclui um conjunto de **Skills para o Antigravity** em [`.agents/
 | [`karate-data-and-secrets`](file:///home/marcos/Documentos/repositorios/karate-speckit-poc/.agents/skills/karate-data-and-secrets/SKILL.md) | Gestão segura de segredos (`.env`, properties, env vars), zero-exposure, geração com Datafaker pt-BR e provisionamento dinâmico de contas. |
 | [`karate-reusability-and-dry`](file:///home/marcos/Documentos/repositorios/karate-speckit-poc/.agents/skills/karate-reusability-and-dry/SKILL.md) | Eliminação de duplicação (DRY), uso correto de `call` vs `callonce`, helpers utilitários e composição de schemas. |
 | [`karate-execution-and-ops`](file:///home/marcos/Documentos/repositorios/karate-speckit-poc/.agents/skills/karate-execution-and-ops/SKILL.md) | Configuração do JUnit 5 `TestRunner`, paralelismo, tags, comandos Maven e diagnóstico via relatórios HTML. |
-
